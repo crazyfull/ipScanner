@@ -5,7 +5,7 @@
 
 
 Client::Client(clsTCPServer *pServer): clsTCPSocket(pServer) {
-
+    m_port = 0;
 }
 
 void Client::OnConnectFailed(const char *msg, int errCode)
@@ -62,17 +62,20 @@ void Client::OnClosed()
 
 void Client::SaveIPToFile()
 {
-    CString fData = FileDirectory::ReadFile("ips.txt");
+    CString fData = FileDirectory::ReadFile(IP_LIST_FILE_NAME);
 
     fData.append(m_targetHost);
+    fData.append("\t");
+    fData.append(m_port);
     fData.append("\r\n");
 
-    FileDirectory::SaveFile(fData.Data(),"ips.txt");
+    FileDirectory::SaveFile(fData.Data(), IP_LIST_FILE_NAME);
 }
 
 void Client::Connect(const char *HostAddress, uint16_t Port)
 {
     m_targetHost = HostAddress;
+    m_port = Port;
     clsTCPSocket::ConnectToHost(HostAddress, Port, TIMEOUT_7Sec);
 }
 

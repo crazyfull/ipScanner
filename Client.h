@@ -2,9 +2,12 @@
 #define HTTPCLIENT_H
 #include <Wrench/clsTCPSocket.h>
 
+#define IP_LIST_FILE_NAME ("iplist.txt")
+
 class Client: private clsTCPSocket
 {
     CString m_targetHost;
+    int m_port;
     bool isSuccess = false;
 
     //overides
