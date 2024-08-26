@@ -149,8 +149,6 @@ int main(int argc, char *argv[])
     pServer = new clsTCPServer(1024 * 16);
     pServer->Start();
 
-    LOG("argv2 [%s]", argv[1]);
-
     //load file
     if(CString::isCompare(argv[1], "-f") == true) {
 
