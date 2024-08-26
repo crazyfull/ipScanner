@@ -1,5 +1,9 @@
 #include "Client.h"
 #include <iostream>
+#include <sstream>
+#include <fstream>
+#include <string>
+
 #include <Wrench/clsTCPServer.h>
 #include <Wrench/log.h>
 #include <Wrench/clsFileDirectory.h>
@@ -38,9 +42,9 @@ IP GetIPAddress(const char*strIPaddress){
 }
 
 void CoonectToTarget(const char* IPAddress){
-    LOG("Clientstr: [%s]", IPAddress);
-    //Client *pClient = new Client(pServer);
-    //pClient->Connect(IPAddress, port);
+    //LOG("Clientstr: [%s]", IPAddress);
+    Client *pClient = new Client(pServer);
+    pClient->Connect(IPAddress, port);
 }
 
 void Scann(const char *startIP, const char *endIP){
@@ -93,12 +97,45 @@ void Scann(const char *startIP, const char *endIP){
 
 }
 
+void ScannWithFile(const char* filePath){
+    std::ifstream inputFile(filePath);
+    if (!inputFile.is_open()) {
+        LOG("can't load the file [%s]", filePath);
+        return ;
+    }
+
+    string line;
+    while (std::getline(inputFile, line)) {
+
+        std::stringstream ss(line);
+        string StartRange;
+        string EndedRange;
+
+        //
+        if (std::getline(ss, StartRange, ',')) {
+            if (std::getline(ss, EndedRange, ',')) {
+                //scan the range
+                Scann(StartRange.c_str(), EndedRange.c_str());
+
+                //save last range
+                FileDirectory::SaveFile(StartRange.c_str(), "lastscan.txt");
+                //LOG("StartRange save [%s]", StartRange.c_str());
+                //sleep(1);
+
+            }
+        }
+
+
+    }
+    inputFile.close();
+}
+
 int main(int argc, char *argv[])
 {
     LOG("CloudFlare tunnel Scanner");
     LOG("help:");
     LOG("scan with entered range: [Start IP range] [the end of the IP range]   [port]  [milisec delay]");
-    LOG("scan with file [-f] [file path]\n");
+    LOG("scan with file [-f] [file path]    [port]  [milisec delay]\n");
 
 
 /*
@@ -116,11 +153,20 @@ int main(int argc, char *argv[])
 
     //load file
     if(CString::isCompare(argv[1], "-f") == true) {
-        const char *filepath = argv[2];
-        LOG("filepath [%s]", filepath);
 
+        if(argc > 3){
+            port = atol(argv[3]);
+        }
+
+        if(argc > 4){
+            delay = atol(argv[4]);
+        }
+
+        ScannWithFile(argv[2]);
         return 0;
     }
+
+
 
     if (argc < 3) {
         LOG("You must enter the start and end IP or load ip database file");
