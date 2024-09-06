@@ -184,7 +184,8 @@ int main(int argc, char *argv[])
     Scann(argv[1], argv[2]);
 
 
-    //getchar();
-    //LOG("end...");
+    LOG("end");
+    getchar();
+
     return 0;
 }
